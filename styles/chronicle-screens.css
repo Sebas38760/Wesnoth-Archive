@@ -1,0 +1,680 @@
+/* chronicle-screens.css – responsive overrides for tablets and phones */
+/* Follows the exact class structure of chronicle-light/dark/high.css */
+/* Includes touch optimisations and smooth scrolling */
+
+/* ---------- Base Resets (same as theme files) ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ---------- Touch & scroll improvements (global) ---------- */
+.timeline-scroll,
+.arrow-scroll,
+.deep-cards-scroll,
+.deep-arrow-scroll {
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+
+/* Disable hover transform on touch devices */
+@media (hover: none) {
+  .event-card:hover {
+    transform: none !important;
+  }
+}
+
+/* Prevent iOS zoom on input/select focus */
+@media (max-width: 600px) {
+  .header-icon {
+    width: 1.6rem !important;
+    height: 1.6rem !important;
+    margin-right: 0.3rem !important;
+  }
+  body .header h1 .header-title {
+    font-size: 1.7rem !important;
+    padding-left: 0.75rem !important;
+  }
+  input, select, textarea, button {
+    font-size: 16px !important;
+  }
+}
+
+/* Ensure media elements don't overflow */
+img, svg, video, canvas, iframe, embed, object {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* ---------- Tablet: ≤ 900px ---------- */
+@media (max-width: 900px) {
+  body {
+    padding: 1.5rem 1rem !important;
+  }
+  .header-icon {
+    width: 1.8rem !important;
+    height: 1.8rem !important;
+    margin-right: 0.4rem !important;
+  }
+  body .header h1 .header-title {
+    font-size: 2rem !important;
+    border-left-width: 4px !important;
+  }
+
+  .container {
+    max-width: 100% !important;
+  }
+
+  .header {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .header h1 {
+    font-size: 2rem !important;
+    border-left-width: 4px !important;
+  }
+
+  .header h1 span {
+    /* unchanged */
+  }
+
+  .sub {
+    margin-top: 0.4rem !important;
+    font-size: 0.95rem !important;
+  }
+
+  .lang-controls {
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+    margin-top: 0.6rem !important;
+  }
+
+  .lang-selector,
+  .events-lang-selector,
+  .theme-selector {
+    padding: 0.25rem 0.8rem !important;
+  }
+
+  .filter-panel {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 1rem 1.5rem !important;
+    margin: 1.5rem 0 1rem !important;
+  }
+
+  .filter-group {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+
+  .type-buttons {
+    gap: 0.5rem !important;
+  }
+
+  .type-btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  .tag-filter {
+    max-height: none !important;
+    gap: 0.5rem !important;
+  }
+
+  .tag-check {
+    padding: 0.35rem 0.9rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .reset-btn,
+  .demo-add-btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  .view-mode-bar {
+    padding: 0.5rem 1rem !important;
+    margin: 0 0 1.2rem 0 !important;
+  }
+
+  .view-btn {
+    padding: 0.4rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .view-container {
+    /* unchanged */
+  }
+
+  .view-container.active-view {
+    /* unchanged */
+  }
+
+  .timeline-nav {
+    margin-bottom: 0.8rem !important;
+    gap: 0.8rem !important;
+  }
+
+  .arrow-btn {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 1.2rem !important;
+  }
+
+  .info-hint {
+    font-size: 0.75rem !important;
+    padding: 0.15rem 0.7rem !important;
+  }
+
+  .timeline-scroll {
+    padding-bottom: 0.8rem !important;
+  }
+
+  .timeline-track {
+    gap: 1.2rem !important;
+  }
+
+  .event-card {
+    width: 280px !important;
+  }
+
+  .event-card:hover {
+    /* unchanged (overridden on touch devices) */
+  }
+
+  .card-header {
+    padding: 0.9rem 1rem 0.4rem !important;
+  }
+
+  .event-year {
+    font-size: 1rem !important;
+    padding: 0.15rem 0.7rem !important;
+  }
+
+  .event-title {
+    font-size: 1.25rem !important;
+  }
+
+  .event-desc {
+    font-size: 0.82rem !important;
+    padding: 0 1rem 0.8rem !important;
+  }
+
+  .tag-list {
+    padding: 0.4rem 1rem 1rem !important;
+  }
+
+  .tag-badge {
+    font-size: 0.65rem !important;
+    padding: 0.2rem 0.7rem !important;
+  }
+
+  .table-wrapper {
+    border-radius: 1.2rem !important;
+  }
+
+  .timeline-table {
+    font-size: 0.8rem !important;
+  }
+
+  .timeline-table th {
+    padding: 0.8rem 0.8rem !important;
+  }
+
+  .timeline-table td {
+    padding: 0.7rem 0.8rem !important;
+  }
+
+  .table-tag-list {
+    gap: 0.25rem !important;
+  }
+
+  .mini-tag {
+    font-size: 0.65rem !important;
+    padding: 0.15rem 0.5rem !important;
+  }
+
+  .arrow-scroll {
+    padding: 1.5rem 0.3rem !important;
+  }
+
+  .arrow-flex {
+    padding: 0.6rem 0.3rem !important;
+  }
+
+  .arrow-node {
+    margin: 0 18px !important;
+  }
+
+  .point-circle {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .node-year {
+    font-size: 0.65rem !important;
+    margin-top: 7px !important;
+  }
+
+  .floating-tooltip {
+    width: 260px !important;
+    padding: 0.8rem !important;
+  }
+
+  .floating-tooltip.visible {
+    /* unchanged */
+  }
+
+  .tooltip-title {
+    font-size: 0.85rem !important;
+  }
+
+  .tooltip-year {
+    font-size: 0.65rem !important;
+  }
+
+  .tooltip-desc {
+    margin: 0.3rem 0 !important;
+  }
+
+  .deep-timeline-section {
+    margin-top: 2.5rem !important;
+    padding: 1.2rem 1rem !important;
+  }
+
+  .deep-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.8rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .deep-header h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .campaign-selector {
+    flex-wrap: wrap !important;
+    padding: 0.3rem 0.8rem !important;
+  }
+
+  .deep-hint {
+    font-size: 0.75rem !important;
+    padding: 0.15rem 0.7rem !important;
+  }
+
+  .deep-view-container {
+    /* unchanged */
+  }
+
+  .deep-view-container.active-deep-view {
+    /* unchanged */
+  }
+
+  .deep-cards-scroll {
+    padding: 0.8rem 0.1rem !important;
+  }
+
+  .deep-cards-track {
+    gap: 1rem !important;
+  }
+
+  .deep-event-card {
+    width: 250px !important;
+  }
+
+  .deep-event-card .card-header {
+    padding: 0.8rem 0.9rem 0.2rem !important;
+  }
+
+  .deep-event-card .event-title {
+    font-size: 1rem !important;
+  }
+
+  .deep-table {
+    font-size: 0.75rem !important;
+  }
+
+  .deep-table th {
+    padding: 0.6rem 0.6rem !important;
+  }
+
+  .deep-table td {
+    padding: 0.6rem 0.6rem !important;
+  }
+
+  .deep-arrow-scroll {
+    padding: 0.8rem 0 !important;
+  }
+
+  .deep-arrow-flex {
+    padding: 0.3rem 0.1rem !important;
+  }
+
+  .deep-arrow-node {
+    margin: 0 16px !important;
+  }
+
+  .deep-point-circle {
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  .deep-node-year {
+    font-size: 0.6rem !important;
+    margin-top: 5px !important;
+  }
+
+  footer {
+    margin-top: 2.5rem !important;
+    font-size: 0.7rem !important;
+    padding-top: 1.2rem !important;
+  }
+
+  .toast-msg {
+    bottom: 15px !important;
+    left: 15px !important;
+    padding: 6px 16px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .empty-msg {
+    padding: 2rem !important;
+    font-size: 1rem !important;
+  }
+
+  .loading-overlay {
+    /* unchanged */
+  }
+
+  .spinner {
+    width: 45px !important;
+    height: 45px !important;
+    border-width: 4px !important;
+  }
+}
+
+/* ---------- Phone: ≤ 600px ---------- */
+@media (max-width: 600px) {
+  body {
+    padding: 1rem 0.75rem !important;
+  }
+
+  .header h1 {
+    font-size: 1.7rem !important;
+    padding-left: 0.75rem !important;
+  }
+
+  .sub {
+    font-size: 0.85rem !important;
+  }
+
+  .lang-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.6rem !important;
+  }
+
+  .lang-selector,
+  .events-lang-selector,
+  .theme-selector {
+    width: 100% !important;
+    justify-content: space-between !important;
+    padding: 0.2rem 1rem !important;
+  }
+
+  .filter-panel {
+    padding: 1rem !important;
+    border-radius: 1.5rem !important;
+  }
+
+  .type-buttons {
+    width: 100% !important;
+  }
+
+  .type-btn {
+    flex: 1 0 calc(50% - 0.3rem) !important;
+    justify-content: center !important;
+    padding: 0.6rem 0.5rem !important;
+  }
+
+  .tag-filter {
+    max-height: 150px !important;
+    overflow-y: auto !important;
+    padding: 0.3rem !important;
+    width: 100% !important;
+  }
+
+  .tag-check {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.75rem !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .reset-btn,
+  .demo-add-btn {
+    padding: 0.5rem 1.2rem !important;
+    font-size: 0.8rem !important;
+    min-height: 44px !important;
+  }
+
+  .view-mode-bar {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    padding: 0.4rem 0.8rem !important;
+  }
+
+  .view-btn {
+    flex: 1 0 calc(33% - 0.4rem) !important;
+    padding: 0.5rem 0.3rem !important;
+    font-size: 0.75rem !important;
+    min-height: 44px !important;
+  }
+
+  .timeline-nav {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+
+  .arrow-btn {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 1.2rem !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
+  .info-hint,
+  .deep-hint {
+    font-size: 0.7rem !important;
+    padding: 0.1rem 0.6rem !important;
+  }
+
+  .event-card {
+    width: 260px !important;
+    border-radius: 1.2rem !important;
+  }
+
+  .event-year {
+    font-size: 0.95rem !important;
+  }
+
+  .event-title {
+    font-size: 1.15rem !important;
+  }
+
+  .event-desc {
+    font-size: 0.78rem !important;
+  }
+
+  .tag-badge {
+    font-size: 0.6rem !important;
+  }
+
+  .timeline-table,
+  .deep-table {
+    font-size: 0.7rem !important;
+    min-width: 100% !important;
+  }
+
+  .timeline-table th,
+  .timeline-table td,
+  .deep-table th,
+  .deep-table td {
+    padding: 0.5rem 0.3rem !important;
+  }
+
+  .arrow-scroll,
+  .deep-arrow-scroll {
+    padding: 1rem 0.2rem !important;
+  }
+
+  .arrow-flex,
+  .deep-arrow-flex {
+    padding: 0.4rem 0 !important;
+  }
+
+  .arrow-node {
+    margin: 0 12px !important;
+  }
+
+  .point-circle {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .node-year {
+    font-size: 0.6rem !important;
+    padding: 0.1rem 0.4rem !important;
+  }
+
+  .deep-arrow-node {
+    margin: 0 10px !important;
+  }
+
+  .deep-point-circle {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .deep-node-year {
+    font-size: 0.55rem !important;
+  }
+
+  .floating-tooltip {
+    width: 220px !important;
+    font-size: 0.8rem !important;
+    padding: 0.7rem !important;
+  }
+
+  .tooltip-title {
+    font-size: 0.85rem !important;
+  }
+
+  .deep-timeline-section {
+    padding: 1rem 0.8rem !important;
+    margin-top: 2rem !important;
+  }
+
+  .deep-header h2 {
+    font-size: 1.3rem !important;
+  }
+
+  .campaign-selector {
+    width: 100% !important;
+  }
+
+  .deep-event-card {
+    width: 230px !important;
+  }
+
+  .deep-event-card .event-title {
+    font-size: 0.95rem !important;
+  }
+
+  footer {
+    font-size: 0.65rem !important;
+    margin-top: 2rem !important;
+  }
+
+  .toast-msg {
+    bottom: 10px !important;
+    left: 10px !important;
+    right: 10px !important;
+    text-align: center !important;
+    font-size: 0.7rem !important;
+  }
+
+  .empty-msg {
+    padding: 1.5rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  button,
+  select,
+  .tag-check,
+  .view-btn,
+  .type-btn,
+  .reset-btn,
+  .arrow-btn {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  select {
+    padding: 0.5rem !important;
+  }
+}
+
+/* ---------- Small Phone: ≤ 400px ---------- */
+@media (max-width: 400px) {
+  .header h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .type-btn {
+    font-size: 0.7rem !important;
+    padding: 0.5rem 0.2rem !important;
+  }
+
+  .view-btn {
+    font-size: 0.7rem !important;
+  }
+
+  .event-card {
+    width: 100% !important;
+    max-width: 280px !important;
+  }
+
+  .deep-event-card {
+    width: 100% !important;
+    max-width: 240px !important;
+  }
+
+  .arrow-node {
+    margin: 0 8px !important;
+  }
+
+  .node-year {
+    white-space: nowrap !important;
+  }
+
+  .floating-tooltip {
+    width: 200px !important;
+  }
+
+  button,
+  select,
+  .tag-check,
+  .view-btn,
+  .type-btn,
+  .reset-btn,
+  .arrow-btn {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+}

@@ -1,0 +1,137 @@
+/* chronicle-dir.css – RTL support for UI and event content (timeline stays LTR) */
+
+body.ui-rtl {
+  direction: rtl;
+}
+
+/* Header */
+body.ui-rtl .header h1 {
+  border-left: none;
+  border-right: 6px solid #c97e5a;
+  padding-left: 0;
+  padding-right: 1rem;
+}
+
+/* Language & theme controls */
+body.ui-rtl .lang-controls {
+  justify-content: flex-start;
+}
+
+body.ui-rtl .lang-selector,
+body.ui-rtl .events-lang-selector,
+body.ui-rtl .theme-selector {
+  flex-direction: row-reverse;
+}
+
+/* Filter panel */
+body.ui-rtl .filter-panel {
+  flex-direction: row-reverse;
+}
+
+body.ui-rtl .filter-group {
+  flex-direction: row-reverse;
+}
+
+body.ui-rtl .type-buttons {
+  flex-direction: row-reverse;
+}
+
+body.ui-rtl .tag-filter {
+  flex-direction: row-reverse;
+}
+
+/* View mode bar */
+body.ui-rtl .view-mode-bar {
+  flex-direction: row-reverse;
+}
+
+/* Timeline navigation (scroll buttons) */
+body.ui-rtl .timeline-nav {
+  flex-direction: row-reverse;
+}
+
+/* Deep header */
+body.ui-rtl .deep-header {
+  flex-direction: row-reverse;
+}
+
+/* Footer */
+body.ui-rtl footer {
+  text-align: right;
+}
+
+/* Toast message */
+body.ui-rtl .toast-msg {
+  left: auto;
+  right: 20px;
+}
+
+/* Tooltip */
+body.ui-rtl .floating-tooltip {
+  text-align: right;
+}
+
+/* Buttons with icons */
+body.ui-rtl .type-btn,
+body.ui-rtl .view-btn,
+body.ui-rtl .reset-btn {
+  flex-direction: row-reverse;
+}
+
+/* ===== RTL for EVENT CONTENT (when events language is RTL) ===== */
+.container.events-rtl .event-card,
+.container.events-rtl .deep-event-card,
+.container.events-rtl .timeline-table,
+.container.events-rtl .deep-table,
+.container.events-rtl .floating-tooltip {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Keep timeline axis LTR for chronological order */
+.container.events-rtl .timeline-scroll,
+.container.events-rtl .arrow-scroll,
+.container.events-rtl .deep-cards-scroll,
+.container.events-rtl .deep-arrow-scroll,
+.container.events-rtl .timeline-track,
+.container.events-rtl .arrow-flex,
+.container.events-rtl .deep-cards-track,
+.container.events-rtl .deep-arrow-flex {
+  direction: ltr !important;
+}
+
+/* Table headers alignment */
+.container.events-rtl .timeline-table th,
+.container.events-rtl .timeline-table td,
+.container.events-rtl .deep-table th,
+.container.events-rtl .deep-table td {
+  text-align: right;
+}
+
+/* Arrow nodes stay LTR */
+.container.events-rtl .arrow-node,
+.container.events-rtl .deep-arrow-node {
+  direction: ltr;
+}
+
+/* Card borders flip for RTL */
+.container.events-rtl .event-card {
+  border-left: none !important;
+  border-right: 8px solid;
+}
+.container.events-rtl .deep-event-card {
+  border-left: none !important;
+  border-right: 6px solid #b57648;
+}
+/* Footer grid remains LTR layout; only text alignment flips */
+body.ui-rtl .footer-grid {
+  direction: rtl;
+  text-align: right;
+}
+body.ui-rtl .footer-col ul {
+  padding-right: 0;
+}
+body.ui-rtl .archive-home-link {
+  margin-left: 0;
+  margin-right: auto;
+}

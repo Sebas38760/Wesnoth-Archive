@@ -1,0 +1,46 @@
+/* index-dir.css – RTL support for UI (mirrors Chronicle's approach) */
+
+body.ui-rtl {
+  direction: rtl;
+}
+
+body.ui-rtl .header h1 {
+  border-left: none;
+  border-right: 6px solid #c97e5a;
+  padding-left: 0;
+  padding-right: 1rem;
+}
+
+body.ui-rtl .lang-controls {
+  flex-direction: row-reverse;
+}
+
+body.ui-rtl .lang-selector,
+body.ui-rtl .theme-selector {
+  flex-direction: row-reverse;
+}
+
+body.ui-rtl .utility-card {
+  border-left: none;
+  border-right: 8px solid #c97e5a;
+}
+
+body.ui-rtl .card-btn {
+  align-self: flex-end;
+}
+
+body.ui-rtl footer {
+  text-align: right;
+}
+/* Footer grid remains LTR layout; only text alignment flips */
+body.ui-rtl .footer-grid {
+  direction: rtl;
+  text-align: right;
+}
+body.ui-rtl .footer-col ul {
+  padding-right: 0;
+}
+body.ui-rtl .archive-home-link {
+  margin-left: 0;
+  margin-right: auto;
+}

@@ -1,0 +1,61 @@
+# netlify.toml
+
+[build]
+  publish = "."
+
+# ---------- Redirects & Clean URLs ----------
+[[redirects]]
+  from = "/chronicle"
+  to = "/Chronicle.html"
+  status = 200
+
+[[redirects]]
+  from = "/offline"
+  to = "/offline.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
+[[redirects]]
+  from = "/policy"
+  to = "/policy.html"
+  status = 200
+
+# Fallback for SPA-like navigation (not strictly needed, but helps)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false   # only if no file matches
+
+# ---------- Custom Headers ----------
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Cache static assets aggressively
+    Cache-Control = "public, max-age=31536000, immutable"
+    # Service worker allowed scope
+    Service-Worker-Allowed = "/"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Service-Worker-Allowed = "/"
+    Cache-Control = "no-cache"

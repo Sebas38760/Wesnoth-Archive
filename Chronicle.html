@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <title>Wesnoth Chronicle | Modular Timeline</title>
+  
+  <!-- PWA / Favicon icons (relative paths) -->
+  <link rel="icon" type="image/png" sizes="72x72" href="assets/icons/pwa-icons/icon-72x72.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/icons/pwa-icons/icon-96x96.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="assets/icons/pwa-icons/icon-128x128.png">
+  <link rel="icon" type="image/png" sizes="144x144" href="assets/icons/pwa-icons/icon-144x144.png">
+  <link rel="icon" type="image/png" sizes="152x152" href="assets/icons/pwa-icons/icon-152x152.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/pwa-icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="384x384" href="assets/icons/pwa-icons/icon-384x384.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/pwa-icons/icon-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/pwa-icons/icon-192x192.png">
+  <meta name="theme-color" content="#2c2a4a">
+<meta name="description" content="Interactive modular timeline for Wesnoth mainline campaigns and UMC lore. Multilingual and themeable.">
+<!-- ========== PRODUCTION SECURITY HEADERS – UNCOMMENT FOR DEPLOYMENT ========== -->
+<!-- 
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    font-src 'self';
+    connect-src 'self';
+    frame-ancestors 'none';
+    base-uri 'self';
+    form-action 'self';
+  ">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+-->
+<!-- ========== END PRODUCTION SECURITY HEADERS ========== -->
+  
+  <!-- Modular CSS files -->
+  <link rel="stylesheet" href="styles/chronicle-colors.css">
+  <link rel="stylesheet" href="styles/chronicle-light.css">
+  <link rel="stylesheet" href="styles/chronicle-dark.css">
+  <link rel="stylesheet" href="styles/chronicle-high.css">
+  <link rel="stylesheet" href="styles/chronicle-screens.css">
+  <link rel="stylesheet" href="styles/chronicle-dir.css">
+</head>
+<body class="theme-light">
+<div class="container">
+  <div class="header">
+    <h1>
+  <img src="assets/icons/pwa-icons/icon-72x72.png" alt="" aria-hidden="true" class="header-icon">
+  <span id="siteTitleSpan" class="header-title">🐉 Wesnoth Chronicle</span>
+</h1>
+<button id="installPwaBtn" class="install-btn" style="display: none;" data-i18n="installButton">📲 Install App</button>
+    <div class="sub"><span id="siteSubtitleSpan">✦ timeline for Wesnoth mainline and UMC</span></div>
+<a href="index.html" class="archive-home-link" id="archiveHomeLink">🏠 Archive Home</a>
+    <div class="lang-controls">
+      <div class="lang-selector">
+        <label id="uiLangLabel" for="languageSelect">🌐 UI Language:</label>
+        <select id="languageSelect"></select>
+      </div>
+      <div class="events-lang-selector">
+        <label id="eventsLangLabel" for="eventsLangSelect">📖 Events language:</label>
+        <select id="eventsLangSelect"></select>
+      </div>
+      <div class="theme-selector" role="radiogroup" aria-label="Theme selection">
+        <label id="themeLabel" for="themeSelect">🎨 Theme:</label>
+        <select id="themeSelect"></select>
+      </div>
+      <!-- Hidden live region for theme change announcements -->
+      <div id="themeAnnouncer" class="sr-only" aria-live="polite" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;"></div>
+    </div>
+  </div>
+
+  <div class="filter-panel">
+    <div class="filter-group">
+      <span id="eventTypeLabel" style="font-weight:500;">🏷️ event type:</span>
+      <div class="type-buttons" id="typeFilterGroup">
+        <button data-type="all" class="type-btn active" id="typeAllBtn">🌍 All</button>
+        <button data-type="campaign" class="type-btn" id="typeCampaignBtn">⚔️ Campaign</button>
+        <button data-type="global" class="type-btn" id="typeGlobalBtn">📜 Global</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <span id="tagsLabel" style="font-weight:500;">🔖 tags:</span>
+      <div id="tagChecklist" class="tag-filter"></div>
+      <button id="resetFiltersBtn" class="reset-btn">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="view-mode-bar">
+    <button data-view="cards" class="view-btn active" id="viewCardsBtn">🃏 Cards</button>
+    <button data-view="table" class="view-btn" id="viewTableBtn">📋 Table</button>
+    <button data-view="arrow" class="view-btn" id="viewArrowBtn">📈 Arrow Timeline</button>
+  </div>
+
+  <div id="cardsView" class="view-container active-view">
+    <div class="timeline-nav">
+      <button id="scrollLeftCards" class="arrow-btn" data-i18n-aria="scrollLeft">◀</button>
+      <button id="scrollRightCards" class="arrow-btn" data-i18n-aria="scrollRight">▶</button>
+      <span id="chronoHint" class="info-hint">⏳ chronological order</span>
+    </div>
+    <div class="timeline-scroll" id="cardsScrollContainer">
+      <div class="timeline-track" id="cardsTrack"></div>
+    </div>
+  </div>
+
+  <div id="tableView" class="view-container">
+    <div class="table-wrapper">
+      <table class="timeline-table">
+        <thead>
+          <tr>
+            <th id="tableYearHeader">Year</th>
+            <th id="tableTitleHeader">Event Title</th>
+            <th id="tableDescHeader">Description</th>
+            <th id="tableTagsHeader">Tags</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="arrowView" class="view-container">
+    <div class="timeline-nav">
+      <button id="scrollLeftArrow" class="arrow-btn" data-i18n-aria="scrollLeft">◀</button>
+      <button id="scrollRightArrow" class="arrow-btn" data-i18n-aria="scrollRight">▶</button>
+      <span id="hoverHint" class="info-hint">🖱️ hover over points</span>
+    </div>
+    <div class="arrow-scroll" id="arrowScrollContainer">
+      <div class="arrow-flex" id="arrowTrack"></div>
+    </div>
+  </div>
+
+  <div class="deep-timeline-section">
+    <div class="deep-header">
+      <h2 id="deepTitle">📖 Campaign Deep Chronicle — Character Arcs</h2>
+      <div class="campaign-selector">
+        <label id="activeCampaignLabel" for="campaignDeepSelect">🎯 Active campaign:</label>
+        <select id="campaignDeepSelect"></select>
+        <span id="syncNote" class="deep-hint">🔄 syncs with main view</span>
+      </div>
+    </div>
+    <div class="timeline-nav" style="justify-content: flex-end; margin-bottom: 0.5rem;">
+      <button id="scrollLeftDeep" class="arrow-btn" data-i18n-aria="scrollLeft">◀</button>
+      <button id="scrollRightDeep" class="arrow-btn" data-i18n-aria="scrollRight">▶</button>
+      <span id="personalBeatsHint" class="deep-hint">📖 personal beats</span>
+    </div>
+    <div id="deepCardsContainer" class="deep-view-container active-deep-view">
+      <div class="deep-cards-scroll">
+        <div class="deep-cards-track" id="deepCardsTrack"></div>
+      </div>
+    </div>
+    <div id="deepTableContainer" class="deep-view-container">
+      <div class="deep-table-wrapper">
+        <table class="deep-table">
+          <thead>
+            <tr>
+              <th id="deepYearHeader">Year</th>
+              <th id="deepEventHeader">Event</th>
+              <th id="deepDescHeader">Description</th>
+            </tr>
+          </thead>
+          <tbody id="deepTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="deepArrowContainer" class="deep-view-container">
+      <div class="deep-arrow-scroll">
+        <div class="deep-arrow-flex" id="deepTimelineTrack"></div>
+      </div>
+    </div>
+  </div>
+
+<footer class="footer-grid">
+  <div class="footer-col">
+    <h3 id="footerLegalHeading">📜 Legal</h3>
+    <ul>
+      <li><a href="terms.html" id="footerTermsLink">Terms of Use</a></li>
+      <li><a href="policy.html" id="footerPrivacyLink">Privacy Policy</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h3 id="footerSiteName">Wesnoth Archive</h3>
+    <p id="footerSiteDesc">✦ utilities for Wesnoth lore & campaigns</p>
+  </div>
+  <div class="footer-col">
+    <h3 id="footerDevHeading">🛠️ Developer</h3>
+    <p id="footerDeveloper">Developed by Mejri Ziad</p>
+    <p id="footerHosted">Hosted on GitHub & Netlify</p>
+  </div>
+</footer>
+</div>
+<div id="toastMsg" class="toast-msg" role="status" aria-live="polite"></div>
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+  <div class="spinner"></div>
+</div>
+
+<!-- UI translation initialiser (must come first) -->
+<script src="scripts/init.js"></script>
+<!-- UI translation modules (modular) -->
+<script src="i18n/ui_en.js"></script>
+<script src="i18n/ui_es.js"></script>
+<script src="i18n/ui_fr.js"></script>
+<script src="i18n/ui_de.js"></script>
+
+<!-- Events data (separate sandbox) -->
+<script src="i18n/events_en.js"></script>
+<script src="i18n/events_ar.js"></script>
+
+<!-- Main logic -->
+<script src="scripts/chronicle.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+</body>
+</html>

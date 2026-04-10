@@ -1,0 +1,64 @@
+/* index-colors.css – colour variables for all index themes */
+
+body.theme-light {
+  --bg-body: #f4f1ea;
+  --text-body: #1e1e2a;
+  --card-bg: white;
+  --card-shadow: 0 12px 28px rgba(0,0,0,0.08);
+  --panel-bg: white;
+  --btn-bg: #f0ede8;
+  --btn-border: none;
+  --btn-text: inherit;
+  --btn-active-bg: #6c5ce7;
+  --btn-active-text: white;
+  --tag-bg: #e0e0e0;
+  --tag-text: #1e1e2a;
+  --border-light: #e2dbd0;
+  --footer-border: #ddd6cc;
+  --header-gradient-start: #2c2a4a;
+  --header-gradient-end: #4a2c5e;
+  --toast-bg: #2c2a4a;
+  --toast-text: white;
+}
+
+body.theme-dark {
+  --bg-body: #12121a;
+  --text-body: #e6e6f0;
+  --card-bg: #1e1e2c;
+  --card-shadow: 0 12px 28px rgba(0,0,0,0.5);
+  --panel-bg: #1a1a28;
+  --btn-bg: #2a2a38;
+  --btn-border: 1px solid #444;
+  --btn-text: #f0f0f0;
+  --btn-active-bg: #6c5ce7;
+  --btn-active-text: white;
+  --tag-bg: #2d2d3f;
+  --tag-text: #e0e0ff;
+  --border-light: #2d2d40;
+  --footer-border: #2d2d40;
+  --header-gradient-start: #c5b8ff;
+  --header-gradient-end: #e6c8ff;
+  --toast-bg: #2c2a4a;
+  --toast-text: white;
+}
+
+body.theme-high-contrast {
+  --bg-body: #000000;
+  --text-body: #ffff00;
+  --card-bg: #000000;
+  --card-shadow: none;
+  --panel-bg: #000000;
+  --btn-bg: #000000;
+  --btn-border: 2px solid #ffff00;
+  --btn-text: #ffff00;
+  --btn-active-bg: #ffff00;
+  --btn-active-text: #000000;
+  --tag-bg: #000000;
+  --tag-text: #ffff00;
+  --border-light: #ffff00;
+  --footer-border: #ffff00;
+  --header-gradient-start: #ffff00;
+  --header-gradient-end: #ffff00;
+  --toast-bg: #000000;
+  --toast-text: #ffff00;
+}

@@ -1,0 +1,44 @@
+/* index-screens.css – responsive overrides for tablets and phones */
+
+@media (max-width: 900px) {
+  body {
+    padding: 1.5rem 1rem !important;
+  }
+  .header h1 {
+    font-size: 2rem !important;
+  }
+  .utilities-grid {
+    gap: 1.5rem !important;
+  }
+  .utility-card {
+    padding: 1.5rem !important;
+  }
+  .card-title {
+    font-size: 1.5rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 1rem 0.75rem !important;
+  }
+  .header h1 {
+    font-size: 1.7rem !important;
+  }
+  .lang-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .lang-selector,
+  .theme-selector {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+  .utilities-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .card-btn {
+    width: 100% !important;
+    text-align: center !important;
+  }
+}

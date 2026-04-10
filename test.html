@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔍 Wesnoth Chronicle – Deep Diagnostic</title>
+  <style>
+    body {
+      font-family: system-ui, 'Segoe UI', monospace;
+      background: #f4f4f8;
+      margin: 2rem;
+      line-height: 1.5;
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 0.2rem; }
+    .sub { color: #2c3e66; margin-bottom: 2rem; }
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      margin-bottom: 1.5rem;
+      padding: 1.5rem 2rem;
+      border-left: 6px solid #3b82f6;
+    }
+    .card h2 {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .card h2 .toggle-icon { font-size: 1.2rem; margin-left: auto; }
+    .card.collapsed .card-content { display: none; }
+    .badge {
+      font-size: 0.75rem;
+      background: #eef2ff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      font-weight: normal;
+    }
+    pre {
+      background: #1e1e2f;
+      color: #f8f8f2;
+      padding: 1rem;
+      border-radius: 14px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+    }
+    .success { color: #15803d; font-weight: bold; }
+    .error { color: #b91c1c; font-weight: bold; }
+    .warning { color: #b45309; font-weight: bold; }
+    .info { color: #1e40af; }
+    hr { margin: 1rem 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #f1f5f9; }
+    .file-list {
+      background: #f8fafc;
+      padding: 0.8rem;
+      border-radius: 12px;
+      font-family: monospace;
+    }
+    .status-icon { font-size: 1.2rem; margin-right: 0.3rem; }
+    .test-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+    }
+    .btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn:hover { background: #2563eb; }
+    .loading-spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(59,130,246,0.3);
+      border-radius: 50%;
+      border-top-color: #3b82f6;
+      animation: spin 0.8s linear infinite;
+      margin-left: 0.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .protocol-badge {
+      background: #1e1e2f;
+      color: #f8f8f2;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      font-family: monospace;
+    }
+    .console-log { max-height: 200px; overflow-y: auto; }
+    .test-pass { color: #15803d; }
+    .test-fail { color: #b91c1c; }
+  </style>
+</head>
+<body>
+  <h1>🐉 Wesnoth Chronicle – Deep Diagnostic</h1>
+  <div class="sub">Modularity · Security · Environment · Compatibility</div>
+
+  <div class="test-controls">
+    <button class="btn" id="runTestsBtn">🔄 Run All Tests</button>
+    <span id="testStatus">Ready</span>
+    <span id="protocolDisplay" class="protocol-badge"></span>
+  </div>
+
+  <!-- Load all project files exactly as in Chronicle.html -->
+  <script src="scripts/init.js"></script>
+  <script src="i18n/ui_en.js"></script>
+  <script src="i18n/ui_es.js"></script>
+  <script src="i18n/ui_fr.js"></script>
+  <script src="i18n/ui_de.js"></script>
+  <script src="i18n/events_en.js"></script>
+  <script src="i18n/events_ar.js"></script>
+
+  <!-- Error capture setup (must run early) -->
+  <script>
+    window.__capturedErrors = [];
+    window.__capturedWarnings = [];
+    const originalError = console.error;
+    const originalWarn = console.warn;
+    console.error = function(...args) {
+      window.__capturedErrors.push(args.map(a => String(a)).join(' '));
+      originalError.apply(console, args);
+    };
+    console.warn = function(...args) {
+      window.__capturedWarnings.push(args.map(a => String(a)).join(' '));
+      originalWarn.apply(console, args);
+    };
+    window.addEventListener('error', (e) => {
+      window.__capturedErrors.push(`${e.message} at ${e.filename}:${e.lineno}`);
+    });
+  </script>
+
+  <div class="card" id="summaryCard">
+    <h2>📋 Overall Status <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="summaryOutput">Running tests...</div>
+  </div>
+
+  <div class="card">
+    <h2>🌍 Network & Protocol Security <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="securityOutput"></div>
+  </div>
+
+  <div class="card">
+    <h2>💾 Storage & Quota <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="storageOutput"></div>
+  </div>
+
+  <div class="card">
+    <h2>📁 File Loading & Script Integrity <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="fileLoadOutput"></div>
+  </div>
+
+  <div class="card">
+    <h2>🌐 UI Translation Modules <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="uiModulesOutput"></div>
+  </div>
+
+  <div class="card">
+    <h2>📖 Events Modules <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="eventsModulesOutput"></div>
+  </div>
+
+  <div class="card">
+    <h2>🏷️ Deep Campaigns Data <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="deepEventsOutput"></div>
+  </div>
+
+  <!-- Asset Check Card -->
+  <div class="card">
+    <h2>🖼️ Asset Availability Check <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="assetsOutput"></div>
+  </div>
+
+  <div class="card">
+    <h2>🐞 Console Errors & Warnings <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="consoleOutput"></div>
+  </div>
+
+  <div class="card">
+    <h2>🔧 Feature Detection <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="featureOutput"></div>
+  </div>
+
+  <div class="card">
+    <h2>📋 Build & Deployment Notes <span class="toggle-icon">▼</span></h2>
+    <div class="card-content" id="notesOutput"></div>
+  </div>
+
+  <script>
+    (function() {
+      const output = {
+        summary: document.getElementById('summaryOutput'),
+        security: document.getElementById('securityOutput'),
+        storage: document.getElementById('storageOutput'),
+        fileLoad: document.getElementById('fileLoadOutput'),
+        uiModules: document.getElementById('uiModulesOutput'),
+        eventsModules: document.getElementById('eventsModulesOutput'),
+        deepEvents: document.getElementById('deepEventsOutput'),
+        assets: document.getElementById('assetsOutput'),
+        consoleOut: document.getElementById('consoleOutput'),
+        feature: document.getElementById('featureOutput'),
+        notes: document.getElementById('notesOutput'),
+        status: document.getElementById('testStatus'),
+        protocolDisplay: document.getElementById('protocolDisplay')
+      };
+
+      const protocol = window.location.protocol;
+      const isFileProtocol = protocol === 'file:';
+      output.protocolDisplay.textContent = `${protocol} // ${isFileProtocol ? 'local file' : 'web server'}`;
+
+      let allOk = true;
+      const warnings = [];
+      const testResults = {};
+
+      function setStatus(text, isLoading = false) {
+        output.status.innerHTML = text + (isLoading ? ' <span class="loading-spinner"></span>' : '');
+      }
+
+      async function waitForGlobal(name, timeout = 2000) {
+        const start = Date.now();
+        while (!window[name]) {
+          if (Date.now() - start > timeout) return null;
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        return window[name];
+      }
+
+      function addTestResult(category, name, pass, message = '') {
+        if (!testResults[category]) testResults[category] = [];
+        testResults[category].push({ name, pass, message });
+        if (!pass) allOk = false;
+      }
+
+      // Collapsible cards
+      document.querySelectorAll('.card h2').forEach(header => {
+        header.addEventListener('click', () => {
+          header.closest('.card').classList.toggle('collapsed');
+        });
+      });
+
+      // Asset list (all paths relative to project root)
+      const ASSETS_TO_CHECK = [
+        'assets/screenshots/pwa-screenshots/screenshot-desktop_1280x720.png',
+        'assets/screenshots/pwa-screenshots/screenshot-mobile_375x667.png',
+        'assets/icons/style-icons/tree.png',
+        'assets/icons/style-icons/skull.png',
+        'assets/icons/style-icons/ship.png',
+        'assets/icons/style-icons/crown.png',
+        'assets/icons/style-icons/users.png',
+        'assets/icons/style-icons/flag.png',
+        'assets/icons/style-icons/helmet-battle.png',
+        'assets/icons/style-icons/wind.png',
+        'assets/icons/style-icons/shield-alt.png',
+        'assets/icons/style-icons/monument.png',
+        'assets/icons/pwa-icons/icon-72x72.png',
+        'assets/icons/pwa-icons/icon-96x96.png',
+        'assets/icons/pwa-icons/icon-128x128.png',
+        'assets/icons/pwa-icons/icon-144x144.png',
+        'assets/icons/pwa-icons/icon-152x152.png',
+        'assets/icons/pwa-icons/icon-192x192.png',
+        'assets/icons/pwa-icons/icon-384x384.png',
+        'assets/icons/pwa-icons/icon-512x512.png'
+      ];
+
+      // ----- Asset Check (works on both file:// and http(s)) -----
+      async function checkAssets() {
+        let html = '';
+        let missingCount = 0;
+
+        // Helper: check a single image via Image loading (works on file://)
+        function checkImage(path) {
+          return new Promise((resolve) => {
+            const img = new Image();
+            const timeout = setTimeout(() => {
+              img.src = '';
+              resolve({ ok: false, status: 'timeout' });
+            }, 3000);
+            img.onload = () => {
+              clearTimeout(timeout);
+              resolve({ ok: true, status: 'loaded' });
+            };
+            img.onerror = () => {
+              clearTimeout(timeout);
+              resolve({ ok: false, status: 'error' });
+            };
+            img.src = path;
+          });
+        }
+
+        if (isFileProtocol) {
+          html = '<table><tr><th>Path</th><th>Status</th><th>Details</th></tr>';
+          for (const path of ASSETS_TO_CHECK) {
+            let status = '⏳ Checking...';
+            let details = '';
+            if (path.endsWith('.png')) {
+              const result = await checkImage(path);
+              if (result.ok) {
+                status = '✅ Found';
+                details = 'Image loaded';
+              } else {
+                status = '❌ Missing';
+                details = result.status;
+                missingCount++;
+              }
+            } else {
+              status = '⚠️ Skipped';
+              details = 'Non-image file (cannot test on file://)';
+            }
+            html += `<tr><td><code>${path}</code></td><td>${status}</td><td>${details}</td></tr>`;
+          }
+          html += '</table>';
+          if (missingCount === 0) {
+            html = '<p class="success">✅ All PNG assets are present.</p>' + html;
+          } else {
+            html = `<p class="error">❌ ${missingCount} PNG asset(s) missing or failed to load.</p>` + html;
+            addTestResult('assets', 'PNG assets check', false, `${missingCount} missing`);
+          }
+          output.assets.innerHTML = html;
+          return;
+        }
+
+        // HTTP/HTTPS – use fetch
+        html = '<table><tr><th>Path</th><th>Status</th><th>Details</th></tr>';
+        for (const path of ASSETS_TO_CHECK) {
+          let status = '⏳ Checking...';
+          let details = '';
+          try {
+            const response = await fetch(path, { method: 'HEAD', cache: 'no-cache' });
+            if (response.ok) {
+              status = '✅ Found';
+              details = `HTTP ${response.status}`;
+            } else {
+              status = '❌ Missing';
+              details = `HTTP ${response.status}`;
+              missingCount++;
+            }
+          } catch (e) {
+            status = '❌ Missing / Error';
+            details = e.message;
+            missingCount++;
+          }
+          html += `<tr><td><code>${path}</code></td><td>${status}</td><td>${details}</td></tr>`;
+        }
+
+        html += '</table>';
+        if (missingCount === 0) {
+          html = '<p class="success">✅ All assets are accessible.</p>' + html;
+        } else {
+          html = `<p class="error">❌ ${missingCount} asset(s) could not be fetched.</p>` + html;
+          addTestResult('assets', 'All assets present', false, `${missingCount} missing`);
+        }
+        output.assets.innerHTML = html;
+      }
+
+      async function runDiagnostics() {
+        allOk = true;
+        warnings.length = 0;
+        setStatus('Running deep diagnostics...', true);
+
+        // Wait for scripts to settle
+        await new Promise(resolve => setTimeout(resolve, 100));
+        await waitForGlobal('translation_ui', 1000).catch(() => {});
+        await waitForGlobal('eventsDB_en', 1000).catch(() => {});
+
+        // -------------------- SECURITY & NETWORK --------------------
+        let securityHtml = '<table>';
+        const isSecureContext = window.isSecureContext;
+        securityHtml += `<tr><td>Secure Context</td><td>${isSecureContext ? '✅ Yes' : '⚠️ No'}</td><td>${isSecureContext ? 'HTTPS or localhost' : 'Features like Clipboard API may be restricted'}</td></tr>`;
+        addTestResult('security', 'Secure Context', isSecureContext);
+
+        const https = protocol === 'https:';
+        securityHtml += `<tr><td>HTTPS</td><td>${https ? '✅ Yes' : (protocol === 'http:' ? '⚠️ No (HTTP)' : 'ℹ️ file://')}</td><td>${https ? 'Encrypted connection' : 'Consider using HTTPS for production'}</td></tr>`;
+        addTestResult('security', 'HTTPS', https || isFileProtocol, 'Not applicable for file://');
+
+        if (!isFileProtocol) {
+          securityHtml += `<tr><td>Mixed Content</td><td>${window.location.protocol === 'https:' ? '✅ Secure page' : '⚠️ Check manually'}</td><td>No automatic detection; check console for mixed content warnings</td></tr>`;
+        }
+
+        const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+        securityHtml += `<tr><td>Content Security Policy (meta)</td><td>${cspMeta ? '🔒 Present' : 'ℹ️ Not set'}</td><td>${cspMeta ? cspMeta.getAttribute('content') : 'No CSP meta tag'}</td></tr>`;
+        addTestResult('security', 'CSP Meta', !cspMeta, 'CSP can restrict inline scripts/styles');
+
+        securityHtml += '</table>';
+        if (isFileProtocol) {
+          securityHtml += '<p class="warning">⚠️ <code>file://</code> protocol: Many security features are disabled (e.g., fetch to local files, service workers). Use a local web server for full functionality.</p>';
+        }
+        output.security.innerHTML = securityHtml;
+
+        // -------------------- STORAGE --------------------
+        let storageHtml = '<table>';
+        try {
+          const testKey = '__test__';
+          localStorage.setItem(testKey, '1');
+          localStorage.removeItem(testKey);
+          storageHtml += `<tr><td>localStorage</td><td>✅ Available</td><td>Read/write successful</td></tr>`;
+          addTestResult('storage', 'localStorage', true);
+        } catch (e) {
+          storageHtml += `<tr><td>localStorage</td><td>❌ Not available</td><td>${e.message}</td></tr>`;
+          addTestResult('storage', 'localStorage', false, e.message);
+        }
+
+        try {
+          const testKey = '__test__';
+          sessionStorage.setItem(testKey, '1');
+          sessionStorage.removeItem(testKey);
+          storageHtml += `<tr><td>sessionStorage</td><td>✅ Available</td><td></td></tr>`;
+        } catch (e) {
+          storageHtml += `<tr><td>sessionStorage</td><td>❌ Not available</td><td>${e.message}</td></tr>`;
+        }
+
+        const idbSupported = !!window.indexedDB;
+        storageHtml += `<tr><td>IndexedDB</td><td>${idbSupported ? '✅ Supported' : '❌ Not supported'}</td><td></td></tr>`;
+        addTestResult('storage', 'IndexedDB', idbSupported);
+
+        if (navigator.storage && navigator.storage.estimate) {
+          try {
+            const estimate = await navigator.storage.estimate();
+            const usage = (estimate.usage / 1024 / 1024).toFixed(2);
+            const quota = (estimate.quota / 1024 / 1024).toFixed(2);
+            storageHtml += `<tr><td>Storage Quota</td><td>ℹ️ ${usage} MB / ${quota} MB</td><td>Available space</td></tr>`;
+          } catch (e) {
+            storageHtml += `<tr><td>Storage Quota</td><td>⚠️ Could not retrieve</td><td>${e.message}</td></tr>`;
+          }
+        } else {
+          storageHtml += `<tr><td>Storage Quota</td><td>ℹ️ Not supported</td><td>Browser does not support Storage API</td></tr>`;
+        }
+        storageHtml += '</table>';
+        output.storage.innerHTML = storageHtml;
+
+        // -------------------- FILE LOADING & INTEGRITY --------------------
+        const scripts = document.querySelectorAll('script[src]');
+        let fileHtml = '<div class="file-list">';
+        let integrityIssues = 0;
+        scripts.forEach(script => {
+          const src = script.src;
+          const integrity = script.getAttribute('integrity');
+          let status = '✅';
+          if (integrity && isFileProtocol) {
+            status = '⚠️ Integrity may fail on file://';
+            integrityIssues++;
+          }
+          fileHtml += `<div>📄 ${src} ${status} ${integrity ? '(has integrity)' : ''}</div>`;
+        });
+        fileHtml += '</div>';
+        if (isFileProtocol) {
+          fileHtml += '<p class="warning">⚠️ <code>file://</code> protocol: Some browsers block script execution if <code>integrity</code> is used. Remove <code>integrity</code> attributes for local testing.</p>';
+        }
+        if (integrityIssues > 0) {
+          addTestResult('loading', 'Integrity on file://', false, 'Integrity attributes may cause script load failure on file://');
+        }
+        output.fileLoad.innerHTML = fileHtml;
+
+        // -------------------- UI TRANSLATION MODULES --------------------
+        let uiHtml = '';
+        if (window.translation_ui) {
+          const codes = Object.keys(window.translation_ui);
+          if (codes.length === 0) {
+            uiHtml = '<span class="error">❌ window.translation_ui exists but is empty.</span>';
+            addTestResult('ui', 'UI modules', false);
+          } else {
+            uiHtml = `<p>✅ Found ${codes.length} UI module(s): ${codes.join(', ')}</p>`;
+            uiHtml += '<table><tr><th>Code</th><th>Name</th><th>Translations</th><th>Sample keys</th></tr>';
+            for (const code of codes) {
+              const mod = window.translation_ui[code];
+              const hasTrans = mod?.translations && Object.keys(mod.translations).length > 0;
+              const sample = hasTrans ? Object.keys(mod.translations).slice(0, 5).join(', ') : 'none';
+              uiHtml += `<tr><td>${code}</td><td>${mod?.name || '?'}</td><td>${hasTrans ? '✅' : '❌'}</td><td>${sample}</td></tr>`;
+              if (!hasTrans) {
+                warnings.push(`UI module ${code} missing translations`);
+                addTestResult('ui', `${code} translations`, false);
+              }
+            }
+            uiHtml += '</table>';
+            addTestResult('ui', 'UI modules', true);
+          }
+        } else {
+          uiHtml = '<span class="error">❌ window.translation_ui is not defined.</span>';
+          addTestResult('ui', 'UI modules', false);
+        }
+        output.uiModules.innerHTML = uiHtml;
+
+        // -------------------- EVENTS MODULES --------------------
+        let eventsHtml = '';
+        let eventModules = [];
+        for (let key in window) {
+          if (key.startsWith('eventsDB_')) eventModules.push(key);
+        }
+        if (eventModules.length === 0) {
+          eventsHtml = '<span class="error">❌ No eventsDB_* found.</span>';
+          addTestResult('events', 'Event modules', false);
+        } else {
+          eventsHtml = `<p>✅ Found ${eventModules.length} event module(s): ${eventModules.join(', ')}</p>`;
+          eventsHtml += '<table><tr><th>Module</th><th>Name</th><th>Dir</th><th>Events</th><th>First ID</th></tr>';
+          for (const modName of eventModules) {
+            const mod = window[modName];
+            const eventsArray = mod?.events;
+            const isValid = eventsArray && Array.isArray(eventsArray);
+            const count = isValid ? eventsArray.length : 0;
+            const firstId = isValid && eventsArray[0] ? eventsArray[0].id : 'N/A';
+            eventsHtml += `<tr><td>${modName}</td><td>${mod?.name || '?'}</td><td>${mod?.dir || '?'}</td><td>${count}</td><td>${firstId}</td></tr>`;
+            if (!isValid) {
+              warnings.push(`${modName}.events invalid`);
+              addTestResult('events', modName, false);
+            } else {
+              const ev = eventsArray[0];
+              const missing = ['id','yearNumeric','title','description','tags','isCampaign'].filter(f => ev[f] === undefined);
+              if (missing.length) {
+                warnings.push(`${modName} first event missing: ${missing.join(',')}`);
+                addTestResult('events', `${modName} fields`, false);
+              }
+            }
+          }
+          eventsHtml += '</table>';
+          addTestResult('events', 'Event modules', eventModules.length > 0);
+        }
+        output.eventsModules.innerHTML = eventsHtml;
+
+        // -------------------- DEEP CAMPAIGNS --------------------
+        let deepHtml = '';
+        let deepCampaigns = [];
+        for (let key in window) {
+          if (key.startsWith('campaignsDeep_')) deepCampaigns.push(key);
+        }
+        if (deepCampaigns.length === 0) {
+          deepHtml = '<span class="warning">⚠️ No campaignsDeep_* found.</span>';
+          warnings.push('Missing deep campaign data');
+          addTestResult('deep', 'Deep campaigns', false);
+        } else {
+          deepHtml = `<p>📚 Found ${deepCampaigns.length} deep file(s): ${deepCampaigns.join(', ')}</p>`;
+          deepHtml += '<table><tr><th>File</th><th>Campaign IDs</th><th>Deep events</th></tr>';
+          for (const deepName of deepCampaigns) {
+            const deepData = window[deepName];
+            if (Array.isArray(deepData)) {
+              const campIds = deepData.map(c => c.id).join(', ');
+              const counts = deepData.map(c => {
+                const eventsKey = `deepEvents_${deepName.slice(13)}`;
+                return c[eventsKey] ? c[eventsKey].length : 0;
+              }).join(', ');
+              deepHtml += `<tr><td>${deepName}</td><td>${campIds}</td><td>${counts}</td></tr>`;
+            } else {
+              deepHtml += `<tr><td>${deepName}</td><td colspan="2" class="error">Not an array</td></tr>`;
+              addTestResult('deep', deepName, false);
+            }
+          }
+          deepHtml += '</table>';
+          addTestResult('deep', 'Deep campaigns', true);
+        }
+        output.deepEvents.innerHTML = deepHtml;
+
+        // -------------------- ASSET CHECK --------------------
+        await checkAssets();
+
+        // -------------------- CONSOLE ERRORS --------------------
+        const errors = window.__capturedErrors || [];
+        const warns = window.__capturedWarnings || [];
+        let consoleHtml = '';
+        if (errors.length === 0 && warns.length === 0) {
+          consoleHtml = '<span class="success">✅ No console errors or warnings captured.</span>';
+        } else {
+          if (errors.length) {
+            consoleHtml += `<div class="error">❌ ${errors.length} error(s):</div><ul class="console-log">`;
+            errors.forEach(e => consoleHtml += `<li class="error">${e}</li>`);
+            consoleHtml += '</ul>';
+          }
+          if (warns.length) {
+            consoleHtml += `<div class="warning">⚠️ ${warns.length} warning(s):</div><ul class="console-log">`;
+            warns.forEach(w => consoleHtml += `<li class="warning">${w}</li>`);
+            consoleHtml += '</ul>';
+          }
+        }
+        output.consoleOut.innerHTML = consoleHtml;
+        addTestResult('console', 'Errors', errors.length === 0);
+        addTestResult('console', 'Warnings', warns.length === 0, warns.length ? 'Warnings present' : '');
+
+        // -------------------- FEATURE DETECTION --------------------
+        let featureHtml = '<table>';
+        const features = [
+          ['Clipboard API', !!navigator.clipboard],
+          ['Fetch API', !!window.fetch],
+          ['Promise', !!window.Promise],
+          ['Arrow Functions', true],
+          ['CSS Grid', CSS.supports('display', 'grid')],
+          ['Flexbox', CSS.supports('display', 'flex')],
+          ['localStorage', (() => { try { localStorage; return true; } catch { return false; } })()],
+          ['IntersectionObserver', !!window.IntersectionObserver],
+          ['ResizeObserver', !!window.ResizeObserver]
+        ];
+        features.forEach(([name, supported]) => {
+          featureHtml += `<tr><td>${name}</td><td>${supported ? '✅' : '❌'}</td></tr>`;
+          if (!supported && name !== 'Arrow Functions') {
+            warnings.push(`Missing feature: ${name}`);
+            addTestResult('feature', name, false);
+          }
+        });
+        featureHtml += '</table>';
+        output.feature.innerHTML = featureHtml;
+
+        // -------------------- NOTES --------------------
+        let notesHtml = `
+          <p><strong>🔧 Best practices for modularity:</strong></p>
+          <ul>
+            <li>UI and event translations are separate namespaces.</li>
+            <li>Add new language by creating <code>ui_xx.js</code> and <code>events_xx.js</code> with proper <code>window</code> assignments.</li>
+            <li>Use <code>window.eventsDB_xx = {...}</code> (not <code>const</code>) for <code>file://</code> compatibility.</li>
+            <li>Check that every event has required fields.</li>
+          </ul>
+          <p><strong>🚀 Deployment:</strong> When hosting on a web server, ensure HTTPS for clipboard and other secure features.</p>
+        `;
+        if (isFileProtocol) {
+          notesHtml += `<p class="warning">⚠️ <code>file://</code> mode: Some features (e.g., fetch to local files) are disabled. Use <code>npx serve</code> or similar for full testing.</p>`;
+        }
+        output.notes.innerHTML = notesHtml;
+
+        // -------------------- SUMMARY --------------------
+        let summaryHtml = '';
+        const passCount = Object.values(testResults).flat().filter(t => t.pass).length;
+        const failCount = Object.values(testResults).flat().filter(t => !t.pass).length;
+        if (allOk && warnings.length === 0) {
+          summaryHtml = `<div class="success">✅ All systems nominal (${passCount} checks passed). The modular timeline should work correctly.</div>`;
+        } else {
+          summaryHtml = `<div class="error">❌ Issues detected (${failCount} failures, ${warnings.length} warnings):</div><ul>`;
+          if (!allOk) summaryHtml += '<li>Critical errors – see details above.</li>';
+          warnings.forEach(w => summaryHtml += `<li>⚠️ ${w}</li>`);
+          summaryHtml += '</ul><p>👉 Most common fix: ensure event files use <code>window.eventsDB_en = ...</code> (not <code>const</code>) when running from <code>file://</code>.</p>';
+        }
+        output.summary.innerHTML = summaryHtml;
+        setStatus(`Tests complete – ${failCount} failures, ${warnings.length} warnings`);
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(runDiagnostics, 200);
+      });
+
+      document.getElementById('runTestsBtn').addEventListener('click', runDiagnostics);
+    })();
+  </script>
+</body>
+</html>

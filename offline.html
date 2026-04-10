@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <title>Wesnoth Archive · Utilities Hub</title>
+  
+  <!-- PWA icons (optional, for installability) -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="72x72" href="assets/icons/pwa-icons/icon-72x72.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/icons/pwa-icons/icon-96x96.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="assets/icons/pwa-icons/icon-128x128.png">
+  <link rel="icon" type="image/png" sizes="144x144" href="assets/icons/pwa-icons/icon-144x144.png">
+  <link rel="icon" type="image/png" sizes="152x152" href="assets/icons/pwa-icons/icon-152x152.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/pwa-icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="384x384" href="assets/icons/pwa-icons/icon-384x384.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/pwa-icons/icon-512x512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/pwa-icons/icon-192x192.png">
+  <meta name="theme-color" content="#2c2a4a">
+<meta name="description" content="Interactive modular timeline for Wesnoth mainline campaigns and UMC lore. Multilingual and themeable.">
+<link rel="preload" href="styles/index-light.css" as="style">
+
+  <!-- Index‑specific styles (modular, same pattern as Chronicle) -->
+  <link rel="stylesheet" href="styles/index-colors.css">
+  <link rel="stylesheet" href="styles/index-light.css">
+  <link rel="stylesheet" href="styles/index-dark.css">
+  <link rel="stylesheet" href="styles/index-high.css">
+  <link rel="stylesheet" href="styles/index-screens.css">   <!-- responsive -->
+  <link rel="stylesheet" href="styles/index-dir.css">       <!-- RTL support -->
+</head>
+<body class="theme-light">
+<div class="container">
+  <header class="header">
+    <h1>
+      <img src="assets/icons/pwa-icons/icon-72x72.png" alt="" aria-hidden="true" class="header-icon">
+      <span id="siteTitleSpan" class="header-title">Wesnoth Archive</span>
+    </h1>
+    <div class="sub"><span id="siteSubtitleSpan">✦ utilities for Wesnoth lore & campaigns</span></div>
+    <div class="lang-controls">
+      <div class="lang-selector">
+        <label id="uiLangLabel" for="languageSelect">🌐 UI Language:</label>
+        <select id="languageSelect"></select>
+      </div>
+      <div class="theme-selector">
+        <label id="themeLabel" for="themeSelect">🎨 Theme:</label>
+        <select id="themeSelect"></select>
+      </div>
+      <div id="themeAnnouncer" class="sr-only" aria-live="polite" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;"></div>
+    </div>
+  </header>
+
+  <main class="utilities-grid">
+    <!-- Only one utility card for now: Wesnoth Chronicle -->
+    <div class="utility-card" id="chronicleCard">
+      <div class="card-icon">🐉</div>
+      <h2 class="card-title" id="chronicleTitle">Wesnoth Chronicle</h2>
+      <p class="card-desc" id="chronicleDesc">Interactive timeline of mainline campaigns and UMC events.</p>
+      <a href="Chronicle.html" class="card-btn" id="chronicleBtn">📖 Open Chronicle →</a>
+    </div>
+    <!-- Additional cards can be added later -->
+  </main>
+
+<footer class="footer-grid">
+  <div class="footer-col">
+    <h3 id="footerLegalHeading">📜 Legal</h3>
+    <ul>
+      <li><a href="terms.html" id="footerTermsLink">Terms of Use</a></li>
+      <li><a href="policy.html" id="footerPrivacyLink">Privacy Policy</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h3 id="footerSiteName">Wesnoth Archive</h3>
+    <p id="footerSiteDesc">✦ utilities for Wesnoth lore & campaigns</p>
+  </div>
+  <div class="footer-col">
+    <h3 id="footerDevHeading">🛠️ Developer</h3>
+    <p id="footerDeveloper">Developed by Mejri Ziad</p>
+    <p id="footerHosted">Hosted on GitHub & Netlify</p>
+  </div>
+</footer>
+</div>
+
+<div id="toastMsg" class="toast-msg" role="status" aria-live="polite"></div>
+<div id="loadingOverlay" class="loading-overlay" style="display: none;"><div class="spinner"></div></div>
+
+<!-- UI translation initialiser (global namespace) -->
+<script src="scripts/init.js"></script>
+<!-- Index UI translations (modular) -->
+<script src="i18n/ui_index_en.js"></script>
+<script src="i18n/ui_index_es.js"></script>
+<script src="i18n/ui_index_fr.js"></script>
+<script src="i18n/ui_index_de.js"></script>
+<!-- Main logic -->
+<script src="scripts/index.js"></script>
+</body>
+</html>

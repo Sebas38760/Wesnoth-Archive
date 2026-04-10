@@ -1,0 +1,4 @@
+# robots.txt
+User-agent: *
+Allow: /
+Sitemap: https://wesnoth-archive.netlify.app/sitemap.xml
